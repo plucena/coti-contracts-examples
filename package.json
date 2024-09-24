@@ -1,8 +1,15 @@
 {
   "name": "hardhat-project",
+  "scripts": {
+    "precompile": "npx hardhat test ./test/Precompile.test.ts",
+    "private-auction": "npx hardhat test ./test/PrivateAuction.test.ts",
+    "private-identity-registry": "npx hardhat test ./test/PrivateIdentityRegistry.test.ts",
+    "private-nft": "npx hardhat test ./test/PrivateNFT.test.ts",
+    "private-token": "npx hardhat test ./test/PrivateToken.test.ts"
+  },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-    "coti-contracts": "https://github.com/coti-io/coti-contracts.git",
+    "coti-contracts": "https://github.com/coti-io/coti-contracts.git#e5eaaeee289abb3356df66d7ef41423fcb7f220e",
     "hardhat": "^2.22.11"
   }
 }

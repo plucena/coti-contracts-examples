@@ -1,6 +1,6 @@
 import hre from "hardhat"
 import { expect } from "chai"
-import { setupAccounts } from "./util/onboard"
+import { setupAccounts } from "./utils/accounts"
 import { ContractTransactionReceipt } from "ethers"
 import { decryptString, buildStringInputText } from "@coti-io/coti-sdk-typescript"
 
@@ -9,15 +9,15 @@ const gasLimit = 12000000
 async function deploy() {
   const [owner, otherAccount] = await setupAccounts()
 
-  const factory = await hre.ethers.getContractFactory("ConfidentialNFTExample")
+  const factory = await hre.ethers.getContractFactory("PrivateNFT")
   const contract = await factory.connect(owner.wallet).deploy({ gasLimit })
+  
   await contract.waitForDeployment()
-  // const contract = await hre.ethers.getContractAt("NFTExample", "0x1Da1088ae90438f137826F7F4902914B503765dA")
-  // console.log(`contractAddress ${await contract.getAddress()}`)
+  
   return { contract, contractAddress: await contract.getAddress(), owner, otherAccount }
 }
 
-describe("Confidential NFT", function () {
+describe("Private NFT", function () {
   let deployment: Awaited<ReturnType<typeof deploy>>
 
   before(async function () {
@@ -36,10 +36,6 @@ describe("Confidential NFT", function () {
     it("Symbol should match deployment symbol", async function () {
       expect(await deployment.contract.symbol()).to.equal("EXL")
     })
-
-    it("Contract owner should be the owner", async function () {
-      expect(await deployment.contract.owner()).to.equal(deployment.owner.wallet.address)
-    })
   })
 
   describe("Minting", function () {
@@ -53,15 +49,15 @@ describe("Confidential NFT", function () {
         
         const encryptedTokenURI = await buildStringInputText(tokenURI, owner, contractAddress, contract.mint.fragment.selector)
 
-        tx = await (
-          await contract
+        const res = await contract
             .connect(owner.wallet)
             .mint(
               otherAccount.wallet.address,
               encryptedTokenURI.map((val) => val.ciphertext),
               encryptedTokenURI.map((val) => val.signature),
               { gasLimit })
-          ).wait()
+        
+        tx = await res.wait()
       })
       
       it("Should emit a 'Minted' event", async function () {
@@ -82,23 +78,6 @@ describe("Confidential NFT", function () {
         expect(await contract.balanceOf(otherAccount.wallet.address)).to.equal(BigInt(1))
       })
 
-    })
-
-    it("Should fail to mint if not owner", async function () {
-      const { contract, contractAddress, otherAccount } = deployment
-
-      const encryptedTokenURI = await buildStringInputText(tokenURI, otherAccount, contractAddress, contract.mint.fragment.selector)
-
-      const tx = await contract
-        .connect(otherAccount.wallet)
-        .mint(
-          otherAccount.wallet.address,
-          encryptedTokenURI.map((val) => val.ciphertext),
-          encryptedTokenURI.map((val) => val.signature),
-          { gasLimit }
-        )
-      
-      expect(tx).to.be.reverted
     })
 
     it("Should fail to mint if the encrypted token URI is faulty", async function () {

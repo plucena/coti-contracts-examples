@@ -2,29 +2,41 @@ import hre from "hardhat"
 import { expect } from "chai"
 import { type ConfidentialAccount, decryptUint, buildInputText } from "@coti-io/coti-sdk-typescript"
 import { setupAccounts } from "./utils/accounts"
-import { deploymentInfo } from "./PrivateERC20Example.test"
 
 const gasLimit = 12000000
 
 async function deploy() {
   const [owner, otherAccount] = await setupAccounts()
 
-  const tokenContract = await hre.ethers.getContractFactory("PrivateERC20Example")
-  const { name, symbol } = deploymentInfo
+  const tokenContract = await hre.ethers.getContractFactory("PrivateToken")
+  const { name, symbol, initialSupply } = { name: "My Private Token", symbol: "PTOK", initialSupply: 500000000n } as const
   const token = await tokenContract
     .connect(owner.wallet)
     .deploy(name, symbol, { gasLimit, from: owner.wallet.address })
 
   await token.waitForDeployment()
 
-  const factory = await hre.ethers.getContractFactory("ConfidentialAuction")
+  await (
+    await token
+      .connect(owner.wallet)
+      .mint(owner.wallet.address, initialSupply)
+  ).wait()
+
+  const factory = await hre.ethers.getContractFactory("PrivateAuction")
   const contract = await factory
     .connect(owner.wallet)
     .deploy(otherAccount.wallet.address, await token.getAddress(), 60 * 60 * 24, true, { gasLimit })
 
   await contract.waitForDeployment()
 
-  return { token, contract, contractAddress: await contract.getAddress(), owner, otherAccount }
+  return {
+    token,
+    tokenAddress: await token.getAddress(),
+    contract,
+    contractAddress: await contract.getAddress(),
+    owner,
+    otherAccount
+  }
 }
 
 async function expectBalance(
@@ -47,7 +59,7 @@ async function expectBid(
   expect(bid).to.equal(amount)
 }
 
-describe("Confidential Auction", function () {
+describe("Private Auction", function () {
   let deployment: Awaited<ReturnType<typeof deploy>>
 
   before(async function () {
@@ -79,13 +91,13 @@ describe("Confidential Auction", function () {
   describe("Bidding", function () {
     const bidAmount = 5
     it(`Bid ${bidAmount}`, async function () {
-      const { token, contract, contractAddress, owner } = deployment
+      const { token, tokenAddress, contract, contractAddress, owner } = deployment
 
       const initialBalance = Number(decryptUint(await token["balanceOf(address)"](owner.wallet.address), owner.userKey))
 
       const itBidAmount = owner.encryptUint(
         bidAmount,
-        contractAddress,
+        tokenAddress,
         token["approve(address,(uint256,bytes))"].fragment.selector
       )
 
@@ -107,13 +119,13 @@ describe("Confidential Auction", function () {
     })
 
     it(`Increase Bid ${bidAmount * 2}`, async function () {
-      const { token, contract, contractAddress, owner } = deployment
+      const { token, tokenAddress, contract, contractAddress, owner } = deployment
 
       const initialBalance = Number(decryptUint(await token["balanceOf(address)"](owner.wallet.address), owner.userKey))
 
       const itBidAmount = owner.encryptUint(
         bidAmount * 2,
-        contractAddress,
+        tokenAddress,
         token["approve(address,(uint256,bytes))"].fragment.selector
       )
 

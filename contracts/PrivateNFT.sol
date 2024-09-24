@@ -10,6 +10,10 @@ contract PrivateNFT is PrivateERC721URIStorage {
 
     constructor() PrivateERC721("Example", "EXL") {}
 
+    function totalSupply() public view returns (uint256) {
+        return _totalSupply;
+    }
+
     function mint(
         address to,
         ctUint64[] calldata _itTokenURI,

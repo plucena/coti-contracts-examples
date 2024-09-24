@@ -1,22 +1,22 @@
 import hre from "hardhat"
 import { expect } from "chai"
 import { decryptUint, buildInputText } from "@coti-io/coti-sdk-typescript"
-import { setupAccounts } from "./util/onboard"
+import { setupAccounts } from "./utils/accounts"
 
 const gasLimit = 12000000
 
 async function deploy() {
   const [owner, otherAccount] = await setupAccounts()
 
-  const factory = await hre.ethers.getContractFactory("ConfidentialIdentityRegistry")
+  const factory = await hre.ethers.getContractFactory("PrivateIdentityRegistry")
   const contract = await factory.connect(owner.wallet).deploy({ gasLimit })
+  
   await contract.waitForDeployment()
-  // const contract = await hre.ethers.getContractAt("ConfidentialAuction", "0xFA71F49669d65dbb91d268780828cB2449CB473c")
-  //   console.log(`contractAddress ${await contract.getAddress()}`)
+
   return { contract, contractAddress: await contract.getAddress(), owner, otherAccount }
 }
 
-describe("Confidential Identity", function () {
+describe("Private Identity Registry", function () {
   let deployment: Awaited<ReturnType<typeof deploy>>
 
   before(async function () {
