@@ -53,8 +53,7 @@ describe("Private NFT", function () {
             .connect(owner.wallet)
             .mint(
               otherAccount.wallet.address,
-              encryptedTokenURI.map((val) => val.ciphertext),
-              encryptedTokenURI.map((val) => val.signature),
+              encryptedTokenURI,
               { gasLimit })
         
         tx = await res.wait()
@@ -86,12 +85,16 @@ describe("Private NFT", function () {
       const ownerEncryptedTokenURI = await buildStringInputText(tokenURI, otherAccount, contractAddress, contract.mint.fragment.selector)
       const otherAccountEncryptedTokenURI = await buildStringInputText(tokenURI, otherAccount, contractAddress, contract.mint.fragment.selector)
 
+      const encryptedTokenURI = {
+        ciphertext: ownerEncryptedTokenURI.ciphertext,
+        signature: otherAccountEncryptedTokenURI.signature
+      }
+
       const tx = await contract
         .connect(otherAccount.wallet)
         .mint(
           otherAccount.wallet.address,
-          ownerEncryptedTokenURI.map((val) => val.ciphertext),
-          otherAccountEncryptedTokenURI.map((val) => val.signature),
+          encryptedTokenURI,
           { gasLimit }
         )
       
@@ -172,8 +175,7 @@ describe("Private NFT", function () {
             .connect(owner.wallet)
             .mint(
               owner.wallet.address,
-              encryptedTokenURI.map((val) => val.ciphertext),
-              encryptedTokenURI.map((val) => val.signature),
+              encryptedTokenURI,
               { gasLimit }
             )
         ).wait()
@@ -201,8 +203,7 @@ describe("Private NFT", function () {
             .connect(owner.wallet)
             .mint(
               owner.wallet.address,
-              encryptedTokenURI.map((val) => val.ciphertext),
-              encryptedTokenURI.map((val) => val.signature),
+              encryptedTokenURI,
               { gasLimit }
             )
         ).wait()

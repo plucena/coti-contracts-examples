@@ -12,9 +12,9 @@ contract DataOnChain {
     ctUint64 private ctNetworkSomeEncryptedValue;
     ctUint64 private ctNetworkSomeEncryptedValueEncryptedInput;
     ctUint64 private ctUserArithmeticResult;
-    ctUint64[] private ctUserSomeEncryptedStringEncryptedInput;
-    ctUint64[] private ctNetworkSomeEncryptedStringEncryptedInput;
-    ctUint64[] private ctUserSomeEncryptedStringValue;
+    ctString private ctUserSomeEncryptedStringEncryptedInput;
+    ctString private ctNetworkSomeEncryptedStringEncryptedInput;
+    ctString private ctUserSomeEncryptedStringValue;
 
     constructor () {
         clearValue = 5;
@@ -22,7 +22,7 @@ contract DataOnChain {
 
     event UserEncryptedValue(address indexed _from, ctUint64 ctUserSomeEncryptedValue);
 
-    event UserEncryptedStringValue(address indexed _from, ctUint64[] ctUserSomeEncryptedStringValue);
+    event UserEncryptedStringValue(address indexed _from, ctString ctUserSomeEncryptedStringValue);
 
 
     function getNetworkSomeEncryptedValue() external view returns (ctUint64 ctSomeEncryptedValue) {
@@ -45,7 +45,7 @@ contract DataOnChain {
         return ctUserSomeEncryptedValueEncryptedInput;
     }
 
-    function getUserSomeEncryptedStringEncryptedInput() external view returns (ctUint64[] memory ctSomeEncryptedValue) {
+    function getUserSomeEncryptedStringEncryptedInput() external view returns (ctString memory ctSomeEncryptedValue) {
         return ctUserSomeEncryptedStringEncryptedInput;
     }
 
@@ -63,23 +63,10 @@ contract DataOnChain {
         ctNetworkSomeEncryptedValueEncryptedInput = MpcCore.offBoard(gtNetworkSomeEncryptedValue); // saves it as cipher text (by network aes key)
     }
 
-    function setSomeEncryptedStringEncryptedInput(ctUint64[] calldata _itInputString, bytes[] calldata _itSignature) external {
-        gtUint64[] memory _encryptedValueGt = new gtUint64[](_itInputString.length);
+    function setSomeEncryptedStringEncryptedInput(itString calldata _itInputString) external {
+        gtString memory _encryptedValueGt = MpcCore.validateCiphertext(_itInputString);
 
-        itUint64 memory it;
-
-        for (uint256 i = 0; i < _itInputString.length; ++i) {
-            it.ciphertext = _itInputString[i];
-            it.signature = _itSignature[i];
-
-            _encryptedValueGt[i] = MpcCore.validateCiphertext(it);
-        }
-
-        ctUint64[] memory tmp = new ctUint64[](_itInputString.length);
-        for (uint256 i = 0; i < _encryptedValueGt.length; ++i) {
-            tmp[i] = MpcCore.offBoard(_encryptedValueGt[i]);
-        }
-        ctNetworkSomeEncryptedStringEncryptedInput = tmp;
+        ctNetworkSomeEncryptedStringEncryptedInput = MpcCore.offBoard(_encryptedValueGt);
     }
 
     function setUserSomeEncryptedValue() external {
@@ -95,16 +82,9 @@ contract DataOnChain {
     }
 
     function setUserSomeEncryptedStringEncryptedInput() external {
-        gtUint64[] memory userGt = new gtUint64[](ctNetworkSomeEncryptedStringEncryptedInput.length);
+        gtString memory userGt = MpcCore.onBoard(ctNetworkSomeEncryptedStringEncryptedInput);
 
-        for (uint256 i = 0; i < ctNetworkSomeEncryptedStringEncryptedInput.length; ++i) {
-            userGt[i] = MpcCore.onBoard(ctNetworkSomeEncryptedStringEncryptedInput[i]);
-        }
-        ctUint64[] memory tmp = new ctUint64[](userGt.length);
-        for (uint256 i = 0; i < userGt.length; ++i) {
-            tmp[i] = MpcCore.offBoardToUser(userGt[i], msg.sender);
-        }
-        ctUserSomeEncryptedStringEncryptedInput = tmp;
+        ctUserSomeEncryptedStringEncryptedInput = MpcCore.offBoardToUser(userGt, msg.sender);
 
         emit UserEncryptedStringValue(msg.sender, ctUserSomeEncryptedStringEncryptedInput);
     }

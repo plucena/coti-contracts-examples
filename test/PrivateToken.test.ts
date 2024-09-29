@@ -168,7 +168,7 @@ describe("Private Token", function () {
                     contract
                         .connect(owner.wallet)
                         ["transfer(address,(uint256,bytes))"]
-                        (ethers.ZeroAddress, { ciphertext: itValue.ctInt, signature: itValue.signature })
+                        (ethers.ZeroAddress, itValue)
                     )
                     .to.be.revertedWithCustomError(contract, "ERC20InvalidReceiver")
                     .withArgs(ethers.ZeroAddress)
@@ -180,7 +180,7 @@ describe("Private Token", function () {
                 const tx = await contract
                     .connect(owner.wallet)
                     ["transfer(address,(uint256,bytes))"]
-                    (otherAccount.wallet.address, { ciphertext: itValue.ctInt, signature: itValue.signature }, { gasLimit: GAS_LIMIT })
+                    (otherAccount.wallet.address, itValue, { gasLimit: GAS_LIMIT })
                 
                 await tx.wait()
 
@@ -205,7 +205,7 @@ describe("Private Token", function () {
                 const tx = await contract
                     .connect(owner.wallet)
                     ["transfer(address,(uint256,bytes))"]
-                    (otherAccount.wallet.address, { ciphertext: itValue.ctInt, signature: itValue.signature }, { gasLimit: GAS_LIMIT })
+                    (otherAccount.wallet.address, itValue, { gasLimit: GAS_LIMIT })
                 
                 await tx.wait()
             })
@@ -239,7 +239,7 @@ describe("Private Token", function () {
                     contract
                         .connect(owner.wallet)
                         ["approve(address,(uint256,bytes))"]
-                        (ethers.ZeroAddress, { ciphertext: itValue.ctInt, signature: itValue.signature })
+                        (ethers.ZeroAddress, itValue)
                     )
                     .to.be.revertedWithCustomError(contract, "ERC20InvalidSpender")
                     .withArgs(ethers.ZeroAddress)
@@ -253,7 +253,7 @@ describe("Private Token", function () {
                 const tx = await contract
                     .connect(owner.wallet)
                     ["approve(address,(uint256,bytes))"]
-                    (otherAccount.wallet.address, { ciphertext: itValue.ctInt, signature: itValue.signature }, { gasLimit: GAS_LIMIT })
+                    (otherAccount.wallet.address, itValue, { gasLimit: GAS_LIMIT })
     
                 await tx.wait()
             })
@@ -291,7 +291,7 @@ describe("Private Token", function () {
                     contract
                         .connect(otherAccount.wallet)
                         ["transferFrom(address,address,(uint256,bytes))"]
-                        (owner.wallet.address, ethers.ZeroAddress, { ciphertext: itValue.ctInt, signature: itValue.signature })
+                        (owner.wallet.address, ethers.ZeroAddress, itValue)
                     )
                     .to.be.revertedWithCustomError(contract, "ERC20InvalidReceiver")
                     .withArgs(ethers.ZeroAddress)
@@ -304,7 +304,7 @@ describe("Private Token", function () {
                     const tx = await contract
                         .connect(otherAccount.wallet)
                         ["transferFrom(address,address,(uint256,bytes))"]
-                        (owner.wallet.address, "0x0000000000000000000000000000000000000001", { ciphertext: itValue.ctInt, signature: itValue.signature })
+                        (owner.wallet.address, "0x0000000000000000000000000000000000000001", itValue)
                     
                     await tx.wait()
                 })
@@ -334,7 +334,7 @@ describe("Private Token", function () {
                 const tx = await contract
                     .connect(otherAccount.wallet)
                     ["transferFrom(address,address,(uint256,bytes))"]
-                    (owner.wallet.address, otherAccount.wallet.address, { ciphertext: itValue.ctInt, signature: itValue.signature })
+                    (owner.wallet.address, otherAccount.wallet.address, itValue)
                 
                 await tx.wait()
             })
@@ -374,7 +374,7 @@ describe("Private Token", function () {
             let tx = await contract
                 .connect(owner.wallet)
                 ["approve(address,(uint256,bytes))"]
-                (otherAccount.wallet.address, { ciphertext: itValue.ctInt, signature: itValue.signature })
+                (otherAccount.wallet.address, itValue)
             
             await tx.wait()
 
@@ -383,7 +383,7 @@ describe("Private Token", function () {
             tx = await contract
                 .connect(otherAccount.wallet)
                 ["transferFrom(address,address,(uint256,bytes))"]
-                (owner.wallet.address, "0x0000000000000000000000000000000000000001", { ciphertext: itValue.ctInt, signature: itValue.signature })
+                (owner.wallet.address, "0x0000000000000000000000000000000000000001", itValue)
             
             await tx.wait()
         })

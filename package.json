@@ -1,5 +1,7 @@
 {
-  "name": "hardhat-project",
+  "name": "coti-contracts-examples",
+  "version": "1.0.0",
+  "description": "",
   "scripts": {
     "precompile": "npx hardhat test ./test/Precompile.test.ts",
     "private-auction": "npx hardhat test ./test/PrivateAuction.test.ts",
@@ -9,7 +11,7 @@
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-    "coti-contracts": "https://github.com/coti-io/coti-contracts.git#e5eaaeee289abb3356df66d7ef41423fcb7f220e",
+    "coti-contracts": "https://github.com/coti-io/coti-contracts.git#12e70356000c0b910adbe1a7285cf9aaccb2650b",
     "hardhat": "^2.22.11"
   }
 }

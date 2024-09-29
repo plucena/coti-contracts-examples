@@ -95,7 +95,7 @@ describe("Private Auction", function () {
 
       const initialBalance = Number(decryptUint(await token["balanceOf(address)"](owner.wallet.address), owner.userKey))
 
-      const itBidAmount = owner.encryptUint(
+      let itBidAmount = owner.encryptUint(
         bidAmount,
         tokenAddress,
         token["approve(address,(uint256,bytes))"].fragment.selector
@@ -105,13 +105,13 @@ describe("Private Auction", function () {
         await token
           .connect(owner.wallet)
           ["approve(address,(uint256,bytes))"]
-          (contractAddress, {ciphertext: itBidAmount.ctInt, signature: itBidAmount.signature}, { gasLimit })
+          (contractAddress, itBidAmount, { gasLimit })
       ).wait()
 
       const func = contract.connect(owner.wallet).bid
       const selector = func.fragment.selector
-      const { ctInt, signature } = await buildInputText(BigInt(bidAmount), owner, contractAddress, selector)
-      await (await func(ctInt, signature, { gasLimit })).wait()
+      itBidAmount = await buildInputText(BigInt(bidAmount), owner, contractAddress, selector)
+      await (await func(itBidAmount, { gasLimit })).wait()
 
       await expectBalance(token, initialBalance - bidAmount, owner)
 
@@ -123,7 +123,7 @@ describe("Private Auction", function () {
 
       const initialBalance = Number(decryptUint(await token["balanceOf(address)"](owner.wallet.address), owner.userKey))
 
-      const itBidAmount = owner.encryptUint(
+      let itBidAmount = owner.encryptUint(
         bidAmount * 2,
         tokenAddress,
         token["approve(address,(uint256,bytes))"].fragment.selector
@@ -133,13 +133,13 @@ describe("Private Auction", function () {
         await token
           .connect(owner.wallet)
           ["approve(address,(uint256,bytes))"]
-          (contractAddress, {ciphertext: itBidAmount.ctInt, signature: itBidAmount.signature}, { gasLimit })
+          (contractAddress, itBidAmount, { gasLimit })
       ).wait()
 
       const func = contract.connect(owner.wallet).bid
       const selector = func.fragment.selector
-      const { ctInt, signature } = await buildInputText(BigInt(bidAmount * 2), owner, contractAddress, selector)
-      await (await func(ctInt, signature, { gasLimit })).wait()
+      itBidAmount = await buildInputText(BigInt(bidAmount * 2), owner, contractAddress, selector)
+      await (await func(itBidAmount, { gasLimit })).wait()
 
       await expectBalance(token, initialBalance - bidAmount, owner)
 

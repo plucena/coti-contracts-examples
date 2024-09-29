@@ -34,8 +34,8 @@ describe("Private Identity Registry", function () {
 
     const func = contract.connect(owner.wallet).setIdentifier
     const selector = func.fragment.selector
-    const { ctInt, signature } = await buildInputText(BigInt(idAge), owner, contractAddress, selector)
-    await (await func(owner.wallet.address, "age", ctInt, signature, { gasLimit })).wait()
+    const itAge = await buildInputText(BigInt(idAge), owner, contractAddress, selector)
+    await (await func(owner.wallet.address, "age", itAge, { gasLimit })).wait()
 
     await (await contract.grantAccess(deployment.owner.wallet.address, ["age"], { gasLimit })).wait()
 

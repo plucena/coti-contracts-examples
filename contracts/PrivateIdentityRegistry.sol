@@ -70,13 +70,9 @@ contract PrivateIdentityRegistry is Ownable2Step {
     function setIdentifier(
         address wallet,
         string calldata identifier,
-        ctUint64 value,
-        bytes calldata signature
+        itUint64 calldata itValue
     ) public {
-        itUint64 memory it;
-        it.ciphertext = value;
-        it.signature = signature;
-        setIdentifier(wallet, identifier, MpcCore.validateCiphertext(it));
+        setIdentifier(wallet, identifier, MpcCore.validateCiphertext(itValue));
     }
 
     function setIdentifier(

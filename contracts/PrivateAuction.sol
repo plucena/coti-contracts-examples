@@ -63,15 +63,11 @@ contract PrivateAuction {
     }
 
     function bid(
-        ctUint64 _itCT,
-        bytes calldata _itSignature
+        itUint64 calldata itBid
     ) public onlyBeforeEnd {
         ctUint64 existingBid = bids[msg.sender];
 
-        itUint64 memory it;
-        it.ciphertext = _itCT;
-        it.signature = _itSignature;
-        gtUint64 gtBid = MpcCore.validateCiphertext(it);
+        gtUint64 gtBid = MpcCore.validateCiphertext(itBid);
 
         if (ctUint64.unwrap(existingBid) == 0) {
             bidCounter++;
