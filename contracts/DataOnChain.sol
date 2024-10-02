@@ -54,17 +54,14 @@ contract DataOnChain {
         ctNetworkSomeEncryptedValue = MpcCore.offBoard(gtNetworkSomeEncryptedValue); // saves it as cipher text (by network aes key)
     }
 
-    function setSomeEncryptedValueEncryptedInput(ctUint64 _itCT, bytes calldata _itSignature) external {
-        itUint64 memory it;
-        it.ciphertext = _itCT;
-        it.signature = _itSignature;
-        gtUint64 gtNetworkSomeEncryptedValue = MpcCore.validateCiphertext(it);  // passage step to make the clear value publicly available by having it encrypted,
+    function setSomeEncryptedValueEncryptedInput(itUint64 calldata itValue) external {
+        gtUint64 gtNetworkSomeEncryptedValue = MpcCore.validateCiphertext(itValue);  // passage step to make the clear value publicly available by having it encrypted,
         // only after decrypting it and validating its cryptographically correct by the sender's key
         ctNetworkSomeEncryptedValueEncryptedInput = MpcCore.offBoard(gtNetworkSomeEncryptedValue); // saves it as cipher text (by network aes key)
     }
 
-    function setSomeEncryptedStringEncryptedInput(itString calldata _itInputString) external {
-        gtString memory _encryptedValueGt = MpcCore.validateCiphertext(_itInputString);
+    function setSomeEncryptedStringEncryptedInput(itString calldata itValue) external {
+        gtString memory _encryptedValueGt = MpcCore.validateCiphertext(itValue);
 
         ctNetworkSomeEncryptedStringEncryptedInput = MpcCore.offBoard(_encryptedValueGt);
     }
