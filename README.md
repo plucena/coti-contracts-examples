@@ -129,14 +129,14 @@ The contract is compiled and deployed with Hardhat using the [`PrivateToken.test
     \
     It is normal to receive the exception `Error: Created new random account [...] Please use faucet to fund it.` on the first run. This will be resolved once the account is funded.  
 
-6. Head to the faucet at [**https://faucet.coti.io**](https://faucet.coti.io) to get devnet funds. \
+6. Head to the faucet at [**https://faucet.coti.io**](https://faucet.coti.io) to get testnet funds. \
    Send the following message to the BOT using your newly created account, visible in the last part of the response.\
    \
-   `devnet <account address>`\
+   `testnet <account address>`\
    \
    The bot will reply with the message:\
    \
-   `<username> faucet transferred 10 COTIv2 (devnet)` \
+   `<username> faucet transferred 10 COTIv2 (testnet)` \
    &#x20;
 7.  Run the `PrivateToken` test suite once more.
 
