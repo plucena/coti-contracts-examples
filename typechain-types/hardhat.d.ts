@@ -38,6 +38,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.PrivateERC721__factory>;
     getContractFactory(
+      name: "MpcCore",
+      signerOrOptions?: ethers.Signer | FactoryOptions
+    ): Promise<Contracts.MpcCore__factory>;
+    getContractFactory(
       name: "ExtendedOperations",
       signerOrOptions?: ethers.Signer | FactoryOptions
     ): Promise<Contracts.ExtendedOperations__factory>;
@@ -137,6 +141,11 @@ declare module "hardhat/types/runtime" {
       signer?: ethers.Signer
     ): Promise<Contracts.PrivateERC721>;
     getContractAt(
+      name: "MpcCore",
+      address: string | ethers.Addressable,
+      signer?: ethers.Signer
+    ): Promise<Contracts.MpcCore>;
+    getContractAt(
       name: "ExtendedOperations",
       address: string | ethers.Addressable,
       signer?: ethers.Signer
@@ -247,6 +256,10 @@ declare module "hardhat/types/runtime" {
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.PrivateERC721>;
     deployContract(
+      name: "MpcCore",
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MpcCore>;
+    deployContract(
       name: "ExtendedOperations",
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.ExtendedOperations>;
@@ -345,6 +358,11 @@ declare module "hardhat/types/runtime" {
       args: any[],
       signerOrOptions?: ethers.Signer | DeployContractOptions
     ): Promise<Contracts.PrivateERC721>;
+    deployContract(
+      name: "MpcCore",
+      args: any[],
+      signerOrOptions?: ethers.Signer | DeployContractOptions
+    ): Promise<Contracts.MpcCore>;
     deployContract(
       name: "ExtendedOperations",
       args: any[],
