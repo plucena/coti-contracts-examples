@@ -1,37 +1,20 @@
-# This workflow will run tests using node and then publish a package to GitHub Packages when a release is created
-# For more information see: https://docs.github.com/en/actions/publishing-packages/publishing-nodejs-packages
-
-name: Node.js/Python Package
+name: Build and Release Node.js/Python Package
 
 on:
   workflow_dispatch:
   release:
     types: [ created ]
-  pull_request:
-    types: [ review_requested ]
 jobs:
-  build:
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-node@v3
-        with:
-          node-version: 16
-      - uses: actions/setup-python@v5
-        with:
-          python-version: "3.x"
-      - run: npm ci
 
   update-version:
-    needs: build
     runs-on: ubuntu-latest
     if: startsWith(github.ref, 'refs/tags/')
     steps:
-      - uses: actions/checkout@v4
+      - name: checkout
+        uses: actions/checkout@v4
       - name: Update package.json version
         run: |
-          TAG_NAME=$(echo ${{github.ref_name}})          
+          TAG_NAME=$(echo ${{github.ref_name}})
           jq --arg tag "$TAG_NAME" '.version = $tag' package.json > tmp.$$.json && mv tmp.$$.json package.json
       
       - name: Update setup.py version
@@ -47,49 +30,54 @@ jobs:
           git add package.json
           git add package-lock.json
           git add setup.py
-          git commit -m "Update package.json version to $TAG_NAME"
+          git commit -m "Update package.json and setup.py version to $TAG_NAME"
           git tag -f $TAG_NAME
           git push --force origin $TAG_NAME
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: actions/setup-node@v3
+  
+  build-npm-package:
+    needs: update-version
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4    
         with:
-          node-version: 16
+          ref: ${{ github.ref }}
+      - name: setup npm
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18
           registry-url: https://registry.npmjs.org/
-      - run: npm ci
-      - run: npm publish --access=public
+      - name: npm ci
+        run: npm ci
+      - name: publish
+        run: npm publish --access=public
         env:
           NODE_AUTH_TOKEN: ${{secrets.npm_token}}
-      
+
+  build-python-package:
+    needs: update-version
+    runs-on: ubuntu-latest
+    steps:
+      - name: checkout
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref }}
       - name: build release distributions
         run: |
           pip install setuptools
           python setup.py sdist
-
       - name: upload windows dists
         uses: actions/upload-artifact@v4
         with:
           name: release-dists
           path: dist/
-
-  pypi-publish:
-    runs-on: ubuntu-latest
-    if: startsWith(github.ref, 'refs/tags/')
-    needs:
-      - update-version
+      - name: Publish release distributions to PyPI
+        uses: pypa/gh-action-pypi-publish@release/v1
     permissions:
       id-token: write
     environment:
       name: python-release-env
       url: https://github.com
-
-    steps:
-      - name: Retrieve release distributions
-        uses: actions/download-artifact@v4
-        with:
-          name: release-dists
-          path: dist/
-
-      - name: Publish release distributions to PyPI
-        uses: pypa/gh-action-pypi-publish@release/v1
       
