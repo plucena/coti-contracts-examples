@@ -19,7 +19,7 @@
   },
   "devDependencies": {
     "@nomicfoundation/hardhat-toolbox": "^5.0.0",
-    "@coti-io/coti-contracts": "^1.0.4",
+    "@coti-io/coti-contracts": "^1.0.5",
     "hardhat": "^2.22.11"
   }
 }
